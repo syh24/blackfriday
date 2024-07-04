@@ -1,28 +1,23 @@
 package com.example.blackfriday.domain;
 
+
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
+
 @Entity
 @Getter
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Member extends BaseTimeEntity{
-
+@Builder
+public class Product extends BaseTimeEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "member_id")
+    @Column(name = "product_id")
     private Long id;
-
-    private String email;
-
-    private String password;
-
-    private String name;
-
-    private String phone;
-
-    @Enumerated(EnumType.STRING)
-    private Role role;
+    private String category;
+    private String title;
+    private String description;
+    private int price;
 }
