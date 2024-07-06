@@ -5,16 +5,12 @@ import com.example.blackfriday.domain.*;
 import com.example.blackfriday.repository.EventProductRepository;
 import com.example.blackfriday.repository.EventRepository;
 import com.example.blackfriday.repository.ProductRepository;
-import com.example.blackfriday.service.EventProduct.EventProductServiceV1Impl;
-import com.example.blackfriday.service.EventProduct.EventProductServiceV2Impl;
 import com.example.blackfriday.service.EventProduct.EventProductServiceV3Impl;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Bean;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -25,7 +21,7 @@ import java.util.concurrent.Executors;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
-class OrderServiceTest {
+class EventProductServiceTest {
 
 //    @Autowired
 //    private EventProductServiceV1Impl service;
@@ -35,9 +31,6 @@ class OrderServiceTest {
 
     @Autowired
     private EventProductServiceV3Impl service;
-
-    @Autowired
-    private OrderService orderService;
 
     @Autowired
     private ProductRepository productRepository;
@@ -98,7 +91,6 @@ class OrderServiceTest {
     public OrderDto.OrderRequest createOrderRequest(Long eventId) {
         return OrderDto.OrderRequest.builder()
                 .eventId(eventId)
-                .quantity(1)
                 .build();
     }
 
@@ -120,8 +112,7 @@ class OrderServiceTest {
             executorService.submit(() -> {
                try {
                    OrderDto.OrderRequest req = createOrderRequest(saveEvent.getId());
-                   service.getEventProduct(req, saveProduct.getId(), LocalDateTime.now());
-//                   orderService.createEventOrder(req, saveProduct.getId(), LocalDateTime.now());
+                   service.processEventProduct(req, saveProduct.getId(), LocalDateTime.now());
                } catch (Exception e) {
                    throw new RuntimeException(e);
                } finally {

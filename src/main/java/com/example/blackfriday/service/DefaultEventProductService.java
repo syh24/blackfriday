@@ -2,6 +2,7 @@ package com.example.blackfriday.service;
 
 import com.example.blackfriday.controller.dto.OrderDto;
 import com.example.blackfriday.domain.*;
+import com.example.blackfriday.exception.event.EventAlreadyParticipationException;
 import com.example.blackfriday.exception.event.EventNotFountException;
 import com.example.blackfriday.exception.event.EventPeriodException;
 import com.example.blackfriday.exception.event.EventProductNotFoundException;
@@ -44,6 +45,11 @@ public class DefaultEventProductService {
         EventProduct eventProduct = eventProductRepository.findEventProductByEventAndProduct(req.getEventId(), productId)
                 .orElseThrow(() -> new EventProductNotFoundException("해당 이벤트 상품이 존재하지 않습니다."));
 
+        //이벤트 중복 참여 여부 확인
+        if (orderRepository.existsOrderByEventAndProduct(event, product)) {
+            throw new EventAlreadyParticipationException("이벤트를 중복 참여하실 수 없습니다.");
+        }
+
         //이벤트 상품 재고 감소
         eventProduct.decreaseEventQuantity();
 
@@ -63,7 +69,7 @@ public class DefaultEventProductService {
         Period startPeriod = Period.between(event.getStartDate(), currentDate);
         Period endPeriod = Period.between(currentDate, event.getEndDate());
 
-        return (startPeriod.isZero() || !startPeriod.isNegative()) && (endPeriod.isZero() || endPeriod.isNegative());
+        return (startPeriod.isZero() || !startPeriod.isNegative()) && (endPeriod.isZero() || !endPeriod.isNegative());
     }
 
 
@@ -76,7 +82,7 @@ public class DefaultEventProductService {
         Duration startDuration = Duration.between(startTime, currentTime.toLocalTime());
         Duration endDuration = Duration.between(currentTime.toLocalTime(), endTime);
 
-        return (startDuration.isZero() || !startDuration.isNegative()) && (endDuration.isZero() || endDuration.isNegative());
+        return (startDuration.isZero() || !startDuration.isNegative()) && (endDuration.isZero() || !endDuration.isNegative());
     }
 
     private boolean checkValidEvent(Event event, LocalDateTime currentTime) {
