@@ -7,9 +7,6 @@ import com.example.blackfriday.repository.EventProductRepository;
 import com.example.blackfriday.repository.LettuceLockRepository;
 import com.example.blackfriday.service.DefaultEventProductService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
@@ -22,7 +19,7 @@ public class EventProductServiceV2Impl implements EventProductService {
     private final DefaultEventProductService defaultEventProductService;
 
     @Override
-    public void getEventProduct(OrderDto.OrderRequest req, Long productId, LocalDateTime currentTime) throws InterruptedException {
+    public void processEventProduct(OrderDto.OrderRequest req, Long productId, LocalDateTime currentTime) throws InterruptedException {
         EventProduct eventProduct = eventProductRepository.findEventProductByEventAndProduct(req.getEventId(), productId)
                 .orElseThrow(() -> new EventProductNotFoundException("해당 이벤트 상품을 찾을 수 없습니다."));
 
@@ -36,7 +33,7 @@ public class EventProductServiceV2Impl implements EventProductService {
 
         try {
             //트랜잭션을 안에서 걸어줌
-            defaultEventProductService.decreaseQuantity(productId, req.getEventId());
+            defaultEventProductService.decreaseQuantity(productId, req, currentTime);
         } finally {
             //unlock
             lettuceLockRepository.unlock(key);

@@ -15,6 +15,10 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Redisson을 이용한 동시성 처리
+ * redissonClient의 getLock 메소드를 통해 처리
+ */
 @Service
 @RequiredArgsConstructor
 public class EventProductServiceV3Impl implements EventProductService{
@@ -23,7 +27,7 @@ public class EventProductServiceV3Impl implements EventProductService{
     private final DefaultEventProductService defaultEventProductService;
 
     @Override
-    public void getEventProduct(OrderDto.OrderRequest req, Long productId, LocalDateTime currentTime) throws InterruptedException {
+    public void processEventProduct(OrderDto.OrderRequest req, Long productId, LocalDateTime currentTime) throws InterruptedException {
         final String worker = Thread.currentThread().getName();
         RLock lock = redissonClient.getLock("redisson_lock p" + productId + "e" + req.getEventId());
 
@@ -34,7 +38,7 @@ public class EventProductServiceV3Impl implements EventProductService{
                 throw new IllegalStateException("락 획득 실패");
             }
 
-            defaultEventProductService.decreaseQuantity(productId, req.getEventId());
+            defaultEventProductService.decreaseQuantity(productId, req, currentTime);
 
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
