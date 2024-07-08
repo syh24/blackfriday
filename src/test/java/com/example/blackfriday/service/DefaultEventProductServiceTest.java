@@ -4,8 +4,8 @@ import com.example.blackfriday.controller.dto.OrderDto;
 import com.example.blackfriday.domain.*;
 import com.example.blackfriday.exception.event.EventAlreadyParticipationException;
 import com.example.blackfriday.exception.event.EventPeriodException;
-import com.example.blackfriday.exception.member.MemberBadRequestException;
 import com.example.blackfriday.repository.*;
+import com.example.blackfriday.service.EventProduct.DefaultEventProductService;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -96,10 +96,10 @@ class DefaultEventProductServiceTest {
                 .build();
     }
 
-    public OrderDto.OrderRequest createOrderRequest(Long eventId, Long memberId) {
-        return OrderDto.OrderRequest.builder()
+    public OrderDto.EventOrderRequest createOrderRequest(Long eventId, Long memberId) {
+        return OrderDto.EventOrderRequest.builder()
                 .memberId(memberId)
-                .eventId(eventId)
+                .eventProductId(eventId)
                 .build();
     }
 
@@ -116,9 +116,9 @@ class DefaultEventProductServiceTest {
         when(memberRepository.findById(anyLong())).thenReturn(Optional.ofNullable(member));
         when(eventRepository.findById(anyLong())).thenReturn(Optional.ofNullable(event));
         when(productRepository.findById(anyLong())).thenReturn(Optional.ofNullable(product));
-        when(eventProductRepository.findEventProductByEventAndProduct(any(), any())).thenReturn(Optional.ofNullable(eventProduct));
+        when(eventProductRepository.findById(any())).thenReturn(Optional.ofNullable(eventProduct));
 
-        defaultEventProductService.decreaseQuantity(product.getId(),createOrderRequest(event.getId(), member.getId()), LocalDateTime.now());
+        defaultEventProductService.decreaseQuantity(eventProduct.getId(), LocalDateTime.now());
 
         assertEquals(499, eventProduct.getEventQuantity());
     }
@@ -135,7 +135,7 @@ class DefaultEventProductServiceTest {
         when(eventRepository.findById(anyLong())).thenReturn(Optional.ofNullable(event));
         when(productRepository.findById(anyLong())).thenReturn(Optional.ofNullable(product));
 
-        Assertions.assertThatThrownBy(() -> defaultEventProductService.decreaseQuantity(product.getId(),createOrderRequest(event.getId(), member.getId()), LocalDateTime.now()))
+        Assertions.assertThatThrownBy(() -> defaultEventProductService.decreaseQuantity(eventProduct.getId(), LocalDateTime.now()))
                 .isInstanceOf(EventPeriodException.class)
                 .hasMessageStartingWith("이벤트 기간이 아닙니다.");
     }
@@ -153,9 +153,9 @@ class DefaultEventProductServiceTest {
         when(memberRepository.findById(anyLong())).thenReturn(Optional.ofNullable(member));
         when(eventRepository.findById(anyLong())).thenReturn(Optional.ofNullable(event));
         when(productRepository.findById(anyLong())).thenReturn(Optional.ofNullable(product));
-        when(eventProductRepository.findEventProductByEventAndProduct(any(), any())).thenReturn(Optional.ofNullable(eventProduct));
+        when(eventProductRepository.findById(any())).thenReturn(Optional.ofNullable(eventProduct));
 
-        Assertions.assertThatThrownBy(() -> defaultEventProductService.decreaseQuantity(product.getId(),createOrderRequest(event.getId(), member.getId()), LocalDateTime.now()))
+        Assertions.assertThatThrownBy(() -> defaultEventProductService.decreaseQuantity(eventProduct.getId(), LocalDateTime.now()))
                 .isInstanceOf(EventAlreadyParticipationException.class)
                 .hasMessageStartingWith("이벤트를 중복 참여하실 수 없습니다.");
     }

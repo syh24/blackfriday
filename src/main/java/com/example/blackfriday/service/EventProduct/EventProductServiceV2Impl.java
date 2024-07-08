@@ -5,7 +5,6 @@ import com.example.blackfriday.domain.EventProduct;
 import com.example.blackfriday.exception.event.EventProductNotFoundException;
 import com.example.blackfriday.repository.EventProductRepository;
 import com.example.blackfriday.repository.LettuceLockRepository;
-import com.example.blackfriday.service.DefaultEventProductService;
 import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDateTime;
@@ -19,8 +18,8 @@ public class EventProductServiceV2Impl implements EventProductService {
     private final DefaultEventProductService defaultEventProductService;
 
     @Override
-    public void processEventProduct(OrderDto.OrderRequest req, Long productId, LocalDateTime currentTime) throws InterruptedException {
-        EventProduct eventProduct = eventProductRepository.findEventProductByEventAndProduct(req.getEventId(), productId)
+    public void processEventProduct(OrderDto.EventOrderRequest req, LocalDateTime currentTime) throws InterruptedException {
+        EventProduct eventProduct = eventProductRepository.findById(req.getEventProductId())
                 .orElseThrow(() -> new EventProductNotFoundException("해당 이벤트 상품을 찾을 수 없습니다."));
 
         Long key = eventProduct.getId();
@@ -33,7 +32,7 @@ public class EventProductServiceV2Impl implements EventProductService {
 
         try {
             //트랜잭션을 안에서 걸어줌
-            defaultEventProductService.decreaseQuantity(productId, req, currentTime);
+            defaultEventProductService.decreaseQuantity(req.getEventProductId(), currentTime);
         } finally {
             //unlock
             lettuceLockRepository.unlock(key);
