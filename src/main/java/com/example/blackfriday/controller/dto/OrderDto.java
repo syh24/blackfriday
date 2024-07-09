@@ -12,7 +12,7 @@ public class OrderDto {
     public static class EventOrderRequest {
         @NotNull(message = "유저 id를 입력해주세요.")
         private Long memberId;
-        @NotNull(message = "이벤트 상품 id를 입력해주세요.")
-        private Long eventProductId;
+        @NotNull(message = "이벤트 id를 입력해주세요.")
+        private Long eventId;
     }
 }

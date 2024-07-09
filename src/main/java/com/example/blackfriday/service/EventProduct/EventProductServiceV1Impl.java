@@ -16,8 +16,8 @@ public class EventProductServiceV1Impl implements EventProductService {
     private final EventProductRepository eventProductRepository;
 
     @Override
-    public void processEventProduct(OrderDto.EventOrderRequest req,  LocalDateTime currentTime) {
-        EventProduct eventProduct = eventProductRepository.findById(req.getEventProductId())
+    public void processEventProduct(OrderDto.EventOrderRequest req, Long eventProductId,  LocalDateTime currentTime) {
+        EventProduct eventProduct = eventProductRepository.findById(eventProductId)
                         .orElseThrow(() -> new EventProductNotFoundException("해당 이벤트 상품을 찾을 수 없습니다."));
 
         eventProduct.decreaseEventQuantity();

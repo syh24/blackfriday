@@ -16,13 +16,13 @@ public class OrderController {
 
     private final EventProductService service;
 
-    @PostMapping("/products/{id}")
+    @PostMapping("/eventProducts/{id}")
     public ApiUtil.ApiSuccessResult<String> createEventOrder(
-            @PathVariable(name = "id") Long productId,
+            @PathVariable(name = "id") Long eventProductId,
             @RequestBody @Valid OrderDto.EventOrderRequest request
             ) throws InterruptedException {
         LocalDateTime now = LocalDateTime.now();
-        service.processEventProduct(request, now);
+        service.processEventProduct(request, eventProductId, now);
         return ApiUtil.success("이벤트 주문이 생성되었습니다.");
     }
 }

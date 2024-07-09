@@ -20,9 +20,9 @@ public class EventProductServiceV3Impl implements EventProductService{
     private final DefaultEventProductService defaultEventProductService;
 
     @Override
-    public void processEventProduct(OrderDto.EventOrderRequest req, LocalDateTime currentTime) throws InterruptedException {
+    public void processEventProduct(OrderDto.EventOrderRequest req, Long eventProductId, LocalDateTime currentTime) throws InterruptedException {
         final String worker = Thread.currentThread().getName();
-        RLock lock = redissonClient.getLock("redisson_lock" + req.getEventProductId());
+        RLock lock = redissonClient.getLock("redisson_lock" + eventProductId);
 
         try {
             //획득시도 시간, 락 점유 시간
@@ -31,7 +31,7 @@ public class EventProductServiceV3Impl implements EventProductService{
                 throw new IllegalStateException("락 획득 실패");
             }
 
-            defaultEventProductService.decreaseQuantity(req.getEventProductId(), currentTime);
+            defaultEventProductService.decreaseQuantity(eventProductId, currentTime);
 
         } catch (InterruptedException e) {
             throw new RuntimeException(e);

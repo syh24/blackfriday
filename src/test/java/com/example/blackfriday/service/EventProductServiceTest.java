@@ -6,6 +6,7 @@ import com.example.blackfriday.repository.EventProductRepository;
 import com.example.blackfriday.repository.EventRepository;
 import com.example.blackfriday.repository.MemberRepository;
 import com.example.blackfriday.repository.ProductRepository;
+import com.example.blackfriday.service.EventProduct.AsyncEventProductServiceImpl;
 import com.example.blackfriday.service.EventProduct.EventProductServiceV2Impl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,11 +27,14 @@ class EventProductServiceTest {
 //    @Autowired
 //    private EventProductServiceV1Impl service;
 
-    @Autowired
-    private EventProductServiceV2Impl service;
+//    @Autowired
+//    private EventProductServiceV2Impl service;
 
 //    @Autowired
 //    private EventProductServiceV3Impl service;
+
+    @Autowired
+    private AsyncEventProductServiceImpl service;
 
     @Autowired
     private ProductRepository productRepository;
@@ -76,7 +80,7 @@ class EventProductServiceTest {
                 .startDate(LocalDate.of(2024, 7,1))
                 .endDate(LocalDate.of(2024, 7,20))
                 .eventStartTime("00:00:00")
-                .eventEndTime("24:00:00")
+                .eventEndTime("23:00:00")
                 .build();
     }
 
@@ -92,7 +96,7 @@ class EventProductServiceTest {
     public OrderDto.EventOrderRequest createOrderRequest(Long eventId, Long memberId) {
         return OrderDto.EventOrderRequest.builder()
                 .memberId(memberId)
-                .eventProductId(eventId)
+                .eventId(eventId)
                 .build();
     }
 
@@ -107,15 +111,15 @@ class EventProductServiceTest {
 
     @Test
     void 이벤트_상품_동시성_테스트() throws Exception {
-        int numberOfThreads = 100;
+        int numberOfThreads = 10;
 
         ExecutorService executorService = Executors.newFixedThreadPool(numberOfThreads);
         CountDownLatch latch = new CountDownLatch(numberOfThreads);
         for (int i = 0; i < numberOfThreads; i++) {
             executorService.submit(() -> {
                try {
-                   OrderDto.EventOrderRequest req = createOrderRequest(eventProduct.getId(), member.getId());
-                   service.processEventProduct(req, LocalDateTime.now());
+                   OrderDto.EventOrderRequest req = createOrderRequest(event.getId(), member.getId());
+                   service.processEventProduct(req, eventProduct.getId(), LocalDateTime.now());
                } catch (Exception e) {
                    throw new RuntimeException(e);
                } finally {

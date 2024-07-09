@@ -18,8 +18,8 @@ public class EventProductServiceV2Impl implements EventProductService {
     private final DefaultEventProductService defaultEventProductService;
 
     @Override
-    public void processEventProduct(OrderDto.EventOrderRequest req, LocalDateTime currentTime) throws InterruptedException {
-        EventProduct eventProduct = eventProductRepository.findById(req.getEventProductId())
+    public void processEventProduct(OrderDto.EventOrderRequest req, Long eventProductId, LocalDateTime currentTime) throws InterruptedException {
+        EventProduct eventProduct = eventProductRepository.findById(eventProductId)
                 .orElseThrow(() -> new EventProductNotFoundException("해당 이벤트 상품을 찾을 수 없습니다."));
 
         Long key = eventProduct.getId();
@@ -32,7 +32,7 @@ public class EventProductServiceV2Impl implements EventProductService {
 
         try {
             //트랜잭션을 안에서 걸어줌
-            defaultEventProductService.decreaseQuantity(req.getEventProductId(), currentTime);
+            defaultEventProductService.decreaseQuantity(eventProductId, currentTime);
         } finally {
             //unlock
             lettuceLockRepository.unlock(key);

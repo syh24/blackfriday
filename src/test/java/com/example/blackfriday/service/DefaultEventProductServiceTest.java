@@ -96,13 +96,6 @@ class DefaultEventProductServiceTest {
                 .build();
     }
 
-    public OrderDto.EventOrderRequest createOrderRequest(Long eventId, Long memberId) {
-        return OrderDto.EventOrderRequest.builder()
-                .memberId(memberId)
-                .eventProductId(eventId)
-                .build();
-    }
-
     @Test
     @DisplayName("재고 감소 성공")
     void eventProductQuantityTest() {
