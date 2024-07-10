@@ -2,12 +2,9 @@ package com.example.blackfriday.service;
 
 import com.example.blackfriday.controller.dto.OrderDto;
 import com.example.blackfriday.domain.*;
-import com.example.blackfriday.repository.EventProductRepository;
-import com.example.blackfriday.repository.EventRepository;
-import com.example.blackfriday.repository.MemberRepository;
-import com.example.blackfriday.repository.ProductRepository;
-import com.example.blackfriday.service.EventProduct.AsyncEventProductServiceImpl;
-import com.example.blackfriday.service.EventProduct.EventProductServiceV2Impl;
+import com.example.blackfriday.repository.*;
+import com.example.blackfriday.service.EventProduct.EventProductServiceV3Impl;
+import com.example.blackfriday.service.async.AsyncEventProductService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,11 +27,11 @@ class EventProductServiceTest {
 //    @Autowired
 //    private EventProductServiceV2Impl service;
 
-//    @Autowired
-//    private EventProductServiceV3Impl service;
+    @Autowired
+    private EventProductServiceV3Impl service;
 
     @Autowired
-    private AsyncEventProductServiceImpl service;
+    private AsyncEventProductService asyncService;
 
     @Autowired
     private ProductRepository productRepository;
@@ -47,6 +44,9 @@ class EventProductServiceTest {
 
     @Autowired
     private MemberRepository memberRepository;
+
+    @Autowired
+    private OrderRepository orderRepository;
 
     private Product product;
     private Event event;
@@ -111,7 +111,7 @@ class EventProductServiceTest {
 
     @Test
     void 이벤트_상품_동시성_테스트() throws Exception {
-        int numberOfThreads = 10;
+        int numberOfThreads = 100;
 
         ExecutorService executorService = Executors.newFixedThreadPool(numberOfThreads);
         CountDownLatch latch = new CountDownLatch(numberOfThreads);
@@ -131,5 +131,30 @@ class EventProductServiceTest {
 
         EventProduct findEventProduct = eventProductRepository.findById(eventProduct.getId()).get();
         assertEquals(400, findEventProduct.getEventQuantity());
+    }
+
+    @Test
+    void 비동기_이벤트_상품_동시성_테스트() throws Exception {
+        int numberOfThreads = 1000;
+
+        ExecutorService executorService = Executors.newFixedThreadPool(32);
+        CountDownLatch latch = new CountDownLatch(numberOfThreads);
+        for (int i = 0; i < numberOfThreads; i++) {
+            executorService.submit(() -> {
+                try {
+                    OrderDto.EventOrderRequest req = createOrderRequest(event.getId(), member.getId());
+                    asyncService.processEventProduct(req, eventProduct.getId(), LocalDateTime.now());
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                } finally {
+                    latch.countDown();
+                }
+            });
+        }
+        latch.await();
+
+        Thread.sleep(10000);
+
+        assertEquals(500, orderRepository.countOrderByEventAndProduct(event, product));
     }
 }
