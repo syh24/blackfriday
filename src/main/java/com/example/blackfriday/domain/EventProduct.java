@@ -8,6 +8,7 @@ import lombok.*;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@ToString
 @Builder
 public class EventProduct {
     @Id
@@ -28,6 +29,11 @@ public class EventProduct {
     public void decreaseEventQuantity() {
         validateQuantity();
         this.eventQuantity -= 1;
+    }
+
+    public void decreaseEventQuantityByScheduler(long q) {
+        validateQuantity();
+        this.eventQuantity -= (int) q;
     }
 
     public void validateQuantity() {
