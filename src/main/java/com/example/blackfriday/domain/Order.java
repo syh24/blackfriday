@@ -18,6 +18,7 @@ public class Order extends BaseTimeEntity {
 
     private int quantity;
     private int orderPrice;
+    private boolean updateQuantityFlag;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id")
@@ -30,4 +31,8 @@ public class Order extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
+
+    public void changeUpdateQuantityFlag() {
+        this.updateQuantityFlag = true;
+    }
 }
