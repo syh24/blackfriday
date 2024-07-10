@@ -10,6 +10,5 @@ import java.util.Optional;
 
 public interface EventProductRepository extends JpaRepository<EventProduct, Long> {
 
-    @Query("select ep from EventProduct ep where ep.event.id = :eventId and ep.product.id = :productId")
-    Optional<EventProduct> findEventProductByEventAndProduct(Long eventId, Long productId);
+    Optional<EventProduct> findEventProductByEventAndProduct(Event event, Product product);
 }
