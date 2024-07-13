@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.access.AccessDeniedHandler;
@@ -46,6 +47,6 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
     }
 
     private void writeErrorResponse(HttpServletResponse response) throws IOException {
-        response.getWriter().write(objectMapper.writeValueAsString(ApiUtil.error(404, "접근 권한이 없습니다.")));
+        response.getWriter().write(objectMapper.writeValueAsString(ApiUtil.error(HttpStatus.NOT_FOUND, "접근 권한이 없습니다.")));
     }
 }
