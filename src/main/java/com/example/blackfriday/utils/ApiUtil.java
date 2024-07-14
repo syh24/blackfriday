@@ -2,6 +2,7 @@ package com.example.blackfriday.utils;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.springframework.http.HttpStatus;
 
 public class ApiUtil {
 
@@ -23,7 +24,7 @@ public class ApiUtil {
      * @param mesasge
      * @return
      */
-    public static <T> ApiErrorResult<T> error(int errorCode, T mesasge) {
+    public static <T> ApiErrorResult<T> error(HttpStatus errorCode, T mesasge) {
         return new ApiErrorResult<>("fail", errorCode, mesasge);
     }
 
@@ -51,7 +52,7 @@ public class ApiUtil {
     public static class ApiErrorResult<T> {
 
         private final String result;
-        private final int errorCode;
+        private final HttpStatus errorCode;
         private final T message;
     }
 }

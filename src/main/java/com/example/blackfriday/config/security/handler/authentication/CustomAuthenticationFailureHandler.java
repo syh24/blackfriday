@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.AuthenticationException;
@@ -41,6 +42,6 @@ public class CustomAuthenticationFailureHandler extends SimpleUrlAuthenticationF
         response.setCharacterEncoding(StandardCharsets.UTF_8.name());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-        response.getWriter().write(objectMapper.writeValueAsString(ApiUtil.error(404, "이메일 또는 비밀번호를 확인해주세요.")));
+        response.getWriter().write(objectMapper.writeValueAsString(ApiUtil.error(HttpStatus.NOT_FOUND, "이메일 또는 비밀번호를 확인해주세요.")));
     }
 }
