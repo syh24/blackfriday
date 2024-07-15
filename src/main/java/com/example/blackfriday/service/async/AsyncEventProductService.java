@@ -6,7 +6,7 @@ import com.example.blackfriday.controller.dto.OrderDto;
 import com.example.blackfriday.domain.redis.EventProductRedis;
 import com.example.blackfriday.domain.redis.EventRedis;
 import com.example.blackfriday.exception.event.EventProductQuantityException;
-import com.example.blackfriday.repository.RedisRepository;
+import com.example.blackfriday.repository.redis.RedisRepository;
 import com.example.blackfriday.service.cache.EventCacheService;
 import com.example.blackfriday.service.cache.EventProductCacheService;
 import lombok.RequiredArgsConstructor;
@@ -38,10 +38,7 @@ public class AsyncEventProductService {
     private void checkValidEventProductRequest(EventProductRedis eventProduct, Long memberId) {
         int q = eventProduct.eventQuantity();
         String key = getEventProductRequestKey(eventProduct.eventProductId());
-        Long count = redisRepository.increment(key);
-        if (q < count) {
-            throw new EventProductQuantityException("이벤트 상품 재고가 소진되었습니다.");
-        }
+        redisRepository.execute(key, memberId.toString(), q);
     }
 
     private void checkValidEventDateAndTime(Long eventId, LocalDateTime currentTime) {
