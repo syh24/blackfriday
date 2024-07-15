@@ -1,0 +1,36 @@
+spring:
+  application:
+    name: blackfriday
+
+  datasource:
+    driver-class-name:
+    url:
+    username:
+    password:
+
+  jpa:
+    hibernate:
+      ddl-auto:
+
+  data:
+    redis:
+      session:
+        host:
+        port:
+      cache:
+        host:
+        port:
+
+  rabbitmq:
+    host:
+    port:
+    username:
+    password:
+
+rabbitmq:
+  queue:
+    name:
+  exchange:
+    name:
+  routing:
+    key:
