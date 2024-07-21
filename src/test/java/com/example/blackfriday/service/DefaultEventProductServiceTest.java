@@ -150,6 +150,6 @@ class DefaultEventProductServiceTest {
 
         Assertions.assertThatThrownBy(() -> defaultEventProductService.decreaseQuantity(eventProduct.getId(), LocalDateTime.now()))
                 .isInstanceOf(EventAlreadyParticipationException.class)
-                .hasMessageStartingWith("이벤트를 중복 참여하실 수 없습니다.");
+                .hasMessageStartingWith("해당 이벤트를 이미 참여하였습니다.");
     }
 }

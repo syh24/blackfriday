@@ -2,9 +2,11 @@ package com.example.blackfriday.service;
 
 import com.example.blackfriday.controller.dto.OrderDto;
 import com.example.blackfriday.domain.*;
+import com.example.blackfriday.exception.event.EventAlreadyParticipationException;
 import com.example.blackfriday.repository.*;
 import com.example.blackfriday.service.EventProduct.EventProductServiceV3Impl;
 import com.example.blackfriday.service.async.AsyncEventProductService;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +18,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
@@ -137,12 +140,14 @@ class EventProductServiceTest {
     void 비동기_이벤트_상품_동시성_테스트() throws Exception {
         int numberOfThreads = 1000;
 
-        ExecutorService executorService = Executors.newFixedThreadPool(32);
+        ExecutorService executorService = Executors.newFixedThreadPool(100);
         CountDownLatch latch = new CountDownLatch(numberOfThreads);
         for (int i = 0; i < numberOfThreads; i++) {
             executorService.submit(() -> {
                 try {
-                    OrderDto.EventOrderRequest req = createOrderRequest(event.getId(), member.getId());
+                    Member tmpMember = createMember();
+                    memberRepository.save(tmpMember);
+                    OrderDto.EventOrderRequest req = createOrderRequest(event.getId(), tmpMember.getId());
                     asyncService.processEventProduct(req, eventProduct.getId(), LocalDateTime.now());
                 } catch (Exception e) {
                     throw new RuntimeException(e);
@@ -156,5 +161,14 @@ class EventProductServiceTest {
         Thread.sleep(10000);
 
         assertEquals(500, orderRepository.countOrderByEventAndProduct(event, product));
+    }
+
+    @Test
+    void 비동기_이벤트_상품_중복회원주문() throws Exception {
+        OrderDto.EventOrderRequest req = createOrderRequest(event.getId(), member.getId());
+        asyncService.processEventProduct(req, eventProduct.getId(), LocalDateTime.now());
+        assertThatThrownBy(() -> asyncService.processEventProduct(req, eventProduct.getId(), LocalDateTime.now()))
+                .isInstanceOf(EventAlreadyParticipationException.class)
+                .hasMessageStartingWith("해당 이벤트를 이미 참여하였습니다.");
     }
 }
