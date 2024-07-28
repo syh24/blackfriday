@@ -4,10 +4,12 @@ import lombok.RequiredArgsConstructor;
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
 import org.redisson.config.Config;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.CacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -26,15 +28,30 @@ import java.time.Duration;
 @EnableRedisHttpSession
 public class RedisConfig {
 
-    @Value("${spring.data.redis.host}")
+    @Value("${spring.data.redis.session.host}")
     private String redisHost;
 
-    @Value("${spring.data.redis.port}")
+    @Value("${spring.data.redis.session.port}")
     private String redisPort;
 
     private static final String REDISSON_HOST_PREFIX = "redis://";
 
+    @Value("${spring.data.redis.cache.host}")
+    private String redisCacheHost;
+
+    @Value("${spring.data.redis.cache.port}")
+    private String redisCachePort;
+
+
+    @Bean(name = "redisCacheConnectionFactory")
+    public RedisConnectionFactory redisCacheConnectionFactory() {
+        return new LettuceConnectionFactory(
+                new RedisStandaloneConfiguration(redisCacheHost, Integer.parseInt(redisCachePort))
+        );
+    }
+
     @Bean
+    @Primary
     public RedisConnectionFactory redisConnectionFactory() {
         return new LettuceConnectionFactory(
                 new RedisStandaloneConfiguration(redisHost, Integer.parseInt(redisPort))
@@ -42,13 +59,14 @@ public class RedisConfig {
     }
 
     @Bean
-    public RedisTemplate<String, Object> redisTemplate() {
+    public RedisTemplate<String, Object> redisTemplate(@Qualifier("redisCacheConnectionFactory") RedisConnectionFactory redisConnectionFactory) {
         RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
-        redisTemplate.setConnectionFactory(redisConnectionFactory());
+        redisTemplate.setConnectionFactory(redisConnectionFactory);
         redisTemplate.setKeySerializer(new StringRedisSerializer());
         redisTemplate.setValueSerializer(new StringRedisSerializer());
         redisTemplate.setHashKeySerializer(new StringRedisSerializer());
         redisTemplate.setHashValueSerializer(new StringRedisSerializer());
+        redisTemplate.setEnableTransactionSupport(true);
         redisTemplate.afterPropertiesSet();
         return redisTemplate;
     }
