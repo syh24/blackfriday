@@ -40,7 +40,7 @@ public class CustomFilterExceptionHandler extends OncePerRequestFilter {
     }
 
     private void setErrorResponse(HttpServletResponse response, JwtExceptionCode code) {
-        response.setStatus(HttpStatus.OK.value());
+        response.setStatus(HttpStatus.UNAUTHORIZED.value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         ApiUtil.ApiErrorResult<String> error = ApiUtil.error(code.getCode(), code.getMessage());
 
