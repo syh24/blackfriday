@@ -28,4 +28,16 @@ public class MemberDto {
         @NotNull(message = "회원권한을 입력해주세요.")
         private Role role;
     }
+
+    @Getter
+    @AllArgsConstructor
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    @Builder
+    public static class LoginRequest {
+        @NotNull(message = "이메일을 입력해주세요.")
+        @Email
+        private String email;
+        @NotNull(message = "비밀번호를 입력해주세요")
+        private String password;
+    }
 }

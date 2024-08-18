@@ -22,5 +22,4 @@ public class MemberController {
         memberService.createMember(joinRequest);
         return ApiUtil.success("회원가입이 완료되었습니다.");
     }
-
 }
