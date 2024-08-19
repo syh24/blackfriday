@@ -1,0 +1,10 @@
+[[Member]]
+== Member API
+
+=== 회원가입 api
+
+==== HTTP request
+include::{snippets}/member-controller-test/join_success_test/http-request.adoc[]
+include::{snippets}/member-controller-test/join_success_test/request-fields.adoc[]
+==== HTTP response
+include::{snippets}/member-controller-test/join_success_test/http-response.adoc[]

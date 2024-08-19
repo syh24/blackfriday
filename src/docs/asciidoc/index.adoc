@@ -1,0 +1,11 @@
+ifndef::snippets[]
+:snippets: ../../../build/generated-snippets
+endif::[]
+= BlackFriday
+:toc: left
+:toclevels: 4
+:sectlinks:
+:adocbase: {snippets}/../../src/docs/asciidoc
+
+include::{adocbase}/member.adoc[]
+include::{adocbase}/order.adoc[]

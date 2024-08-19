@@ -2,35 +2,39 @@ spring:
   application:
     name: blackfriday
 
+  jwt:
+    secret: c2lsdmVybmluZS10ZWNoLXNwcmluZy1ib290LWp3dC10dXRvcmlhbC1zZWNyZXQtc2lsdmVybmluZS10ZWNoLXNwcmluZy1ib290LWp3dC10dXRvcmlhbC1zZWNyZXQK
+
   datasource:
-    driver-class-name:
-    url:
-    username:
-    password:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/blackfriday?characterEncoding=UTF-8&serverTimezone=UTC
+    username: root
+    password: 1234
 
   jpa:
     hibernate:
-      ddl-auto:
+      ddl-auto: update
 
   data:
     redis:
       session:
-        host:
-        port:
+        host: localhost
+        port: 6379
       cache:
-        host:
-        port:
+        host: localhost
+        port: 6380
 
   rabbitmq:
-    host:
-    port:
-    username:
-    password:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
 
 rabbitmq:
   queue:
-    name:
+    name: event-product.queue
   exchange:
-    name:
+    name: event-product.exchange
   routing:
-    key:
+    key: event-product.key
+
