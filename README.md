@@ -16,10 +16,13 @@
 ## 개발 내용
 ### 로그인/회원가입
 - 회원가입
-- 로그인 기능 (JWT 토큰 활용)
+- 로그인 기능 (Spring Security + JWT 토큰 활용)
 
 ### 다양한 이벤트 주문 재고 처리
 - synchronized 이용한 동기 처리
 - LettuceLock을 이용한 동기 처리
 - Redisson을 이용한 동기 처리
 - Redis + RabbitMQ를 이용한 비동기 처리
+
+### 문서
+- RestDoc을 이용한 API 문서 정리
