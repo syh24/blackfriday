@@ -1,0 +1,10 @@
+[[Order]]
+== Order API
+
+=== 주문 api
+
+==== HTTP request
+include::{snippets}/order-controller-test/create-order/http-request.adoc[]
+include::{snippets}/order-controller-test/create-order/request-fields.adoc[]
+==== HTTP response
+include::{snippets}/order-controller-test/create-order/http-response.adoc[]

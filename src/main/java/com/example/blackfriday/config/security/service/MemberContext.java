@@ -7,7 +7,7 @@ import org.springframework.security.core.userdetails.User;
 
 import java.util.Collection;
 
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper = false)
 public class MemberContext extends User {
 
     private Member member;

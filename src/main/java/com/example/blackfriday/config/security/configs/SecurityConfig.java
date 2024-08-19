@@ -45,6 +45,7 @@ public class SecurityConfig {
                 )
                 .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests
+                                .requestMatchers("/docs/*").permitAll()
                                 .requestMatchers("/api/v1/members/join", "/login").permitAll()
                                 .requestMatchers(
                                         "/member").hasAnyRole("USER")
