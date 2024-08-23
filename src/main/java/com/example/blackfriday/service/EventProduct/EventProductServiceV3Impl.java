@@ -1,9 +1,14 @@
 package com.example.blackfriday.service.EventProduct;
 
+import com.example.blackfriday.annotation.DistributedLock;
 import com.example.blackfriday.controller.dto.OrderDto;
+import com.example.blackfriday.domain.EventProduct;
+import com.example.blackfriday.exception.event.EventProductNotFoundException;
+import com.example.blackfriday.repository.EventProductRepository;
 import com.example.blackfriday.service.redis.RedissonLockHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
@@ -15,14 +20,12 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class EventProductServiceV3Impl implements EventProductService {
 
-    private final RedissonLockHandler redissonLock;
     private final DefaultEventProductService defaultEventProductService;
+    private final EventProductRepository eventProductRepository;
 
+    @DistributedLock(key = "redisson_lock:")
     @Override
     public void processEventProduct(OrderDto.EventOrderRequest req, Long eventProductId, LocalDateTime currentTime) throws InterruptedException {
-        String lockName ="redisson_lock" + eventProductId;
-        redissonLock.execute(lockName, 5, 3, () ->
-                defaultEventProductService.decreaseQuantity(eventProductId, currentTime)
-        );
+        defaultEventProductService.decreaseQuantity(eventProductId, currentTime);
     }
 }
