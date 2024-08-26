@@ -22,7 +22,7 @@ public class EventProductConsumer {
         orderService.createOrder(message);
     }
 
-//    @Scheduled(fixedDelay = 10000)
+    @Scheduled(fixedDelay = 10000)
     private void updateEventProductQuantity() {
         log.info("이벤트 상품 재고 동기화");
         updateEventProductService.synchronizedQuantity();

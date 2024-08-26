@@ -74,7 +74,7 @@ class EventProductServiceTest {
                 .category("블랙프라이데이")
                 .description("블프 기념 할인 한정 수량 이벤트")
                 .startDate(LocalDate.of(2024, 8,1))
-                .endDate(LocalDate.of(2024, 8,22))
+                .endDate(LocalDate.of(2024, 8,31))
                 .eventStartTime("00:00:00")
                 .eventEndTime("23:00:00")
                 .build();
