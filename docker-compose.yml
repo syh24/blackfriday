@@ -1,0 +1,63 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    container_name: blackfriday
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mysql
+      - redis-cache
+      - redis-session
+      - rabbitmq
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/blackfriday?characterEncoding=UTF-8&serverTimezone=UTC
+      SPRING_DATA_REDIS_SESSION_HOST: redis-session
+      SPRING_DATA_REDIS_CACHE_HOST: redis-cache
+      SPRING_RABBITMQ_HOST: rabbitmq
+    networks:
+      - app-network
+
+  mysql:
+    image: mysql:8.0.36
+    container_name: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: 1234
+      MYSQL_DATABASE: blackfriday
+    ports:
+      - "3306:3306"
+    networks:
+      - app-network
+
+  redis-session:
+    image: redis:latest
+    container_name: redis-session
+    command: [ "redis-server", "--bind", "redis-session", "--port", "6379" ]
+    ports:
+      - "6379:6379"
+    networks:
+      - app-network
+
+  redis-cache:
+    image: redis:latest
+    container_name: redis-cache
+    command: [ "redis-server", "--bind", "redis-cache", "--port", "6380" ]
+    ports:
+      - "6380:6379"
+    networks:
+      - app-network
+
+  rabbitmq:
+    image: rabbitmq:management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    name: app-network
+    driver: bridge
